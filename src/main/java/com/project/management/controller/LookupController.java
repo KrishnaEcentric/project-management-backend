@@ -2,9 +2,11 @@ package com.project.management.controller;
 
 import com.project.management.dto.DzongkhagDTO;
 import com.project.management.dto.GewogDTO;
+import com.project.management.dto.RoleDTO;
 import com.project.management.dto.VillageDTO;
 import com.project.management.service.DzongkhagLookupService;
 import com.project.management.service.GewogLookupService;
+import com.project.management.service.RoleLookupService;
 import com.project.management.service.VillageLookupService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/lookup")
-@Tag(name = "Lookup API", description = "APIs for geographical lookup data")
+@Tag(name = "Lookup API", description = "APIs for all lookup data")
 public class LookupController {
 
     @Autowired
@@ -26,6 +28,9 @@ public class LookupController {
 
     @Autowired
     private VillageLookupService villageLookupService;
+
+    @Autowired
+    private RoleLookupService roleLookupService;
 
     // 1. Get all dzongkhags
     @Operation(summary = "Get all dzongkhags", description = "Returns a list of all dzongkhags")
@@ -106,6 +111,26 @@ public class LookupController {
         GewogDTO gewog = gewogLookupService.getGewogByGewogId(gewogId);
         if (gewog != null) {
             return ResponseEntity.ok(gewog);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // 10. Get all roles
+    @Operation(summary = "Get all roles", description = "Returns a list of all roles")
+    @GetMapping("/roles")
+    public ResponseEntity<List<RoleDTO>> getAllRoles() {
+        List<RoleDTO> roles = roleLookupService.getAllRoles();
+        return ResponseEntity.ok(roles);
+    }
+
+    // 11. Get role by role ID
+    @Operation(summary = "Get role by role ID", description = "Returns a specific role by its role ID")
+    @GetMapping("/role/{roleId}")
+    public ResponseEntity<RoleDTO> getRoleByRoleId(@PathVariable Integer roleId) {
+        RoleDTO role = roleLookupService.getRoleByRoleId(roleId);
+        if (role != null) {
+            return ResponseEntity.ok(role);
         } else {
             return ResponseEntity.notFound().build();
         }
