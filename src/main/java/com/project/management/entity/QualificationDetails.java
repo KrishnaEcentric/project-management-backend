@@ -20,7 +20,7 @@ public class QualificationDetails {
     private Integer id;
 
     @Column(name = "qualificationid", nullable = false, length = 50, unique = true)
-    private String qualificationId;
+    private Integer qualificationId;
 
     @Column(name = "userid", nullable = false, length = 50)
     private String userId;
@@ -46,7 +46,7 @@ public class QualificationDetails {
     @Column(name = "updatedat")
     private LocalDateTime updatedAt;
 
-    public QualificationDetails(String qualificationId, String userId, String qualificationName, String institution) {
+    public QualificationDetails(Integer qualificationId, String userId, String qualificationName, String institution) {
         this.qualificationId = qualificationId;
         this.userId = userId;
         this.qualificationName = qualificationName;

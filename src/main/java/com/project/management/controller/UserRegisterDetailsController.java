@@ -6,8 +6,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 
 @RestController
@@ -90,5 +93,43 @@ public class UserRegisterDetailsController {
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
         userRegisterDetailsService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Add user photo", description = "Upload and store user photo")
+    @PostMapping(value = "/{userId}/photo", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addUserPhoto(
+            @PathVariable String userId,
+            @RequestParam("file") MultipartFile file) {
+        try {
+            String photoUrl = userRegisterDetailsService.addUserPhoto(userId, file);
+            return ResponseEntity.ok().body("{\"photoUrl\": \"" + photoUrl + "\"}");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error uploading photo: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Get user photo", description = "Retrieve user photo by filename")
+    @GetMapping(value = "/photo/{fileName}", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<byte[]> getUserPhoto(@PathVariable String fileName) {
+        try {
+            byte[] photoData = userRegisterDetailsService.getUserPhoto(fileName);
+            return ResponseEntity.ok().body(photoData);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Get user photo by userId", description = "Retrieve user photo by userId")
+    @GetMapping(value = "/{userId}/photo", produces = {MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_PNG_VALUE})
+    public ResponseEntity<byte[]> getUserPhotoByUserId(@PathVariable String userId) {
+        try {
+            byte[] photoData = userRegisterDetailsService.getUserPhotoByUserId(userId);
+            return ResponseEntity.ok().body(photoData);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

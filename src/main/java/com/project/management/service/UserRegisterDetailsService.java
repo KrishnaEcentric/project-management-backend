@@ -5,6 +5,9 @@ import com.project.management.entity.UserRegisterDetails;
 import com.project.management.repository.UserRegisterDetailsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,6 +17,9 @@ public class UserRegisterDetailsService {
 
     @Autowired
     private UserRegisterDetailsRepository userRegisterDetailsRepository;
+
+    @Autowired
+    private FileStorageService fileStorageService;
 
     public UserRegisterDetailsDTO createUser(UserRegisterDetailsDTO userDTO) {
         // Check if email or userId already exists
@@ -116,5 +122,49 @@ public class UserRegisterDetailsService {
                 user.getUpdatedBy(),
                 user.getUpdatedAt()
         );
+    }
+
+    public String addUserPhoto(String userId, MultipartFile file) {
+        try {
+            // Check if user exists
+            UserRegisterDetails user = userRegisterDetailsRepository.findByUserId(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with userId: " + userId));
+
+            // Store file and get filename
+            String fileName = fileStorageService.storeFile(file, userId);
+
+            // Build photo URL (you can customize this based on your needs)
+            String photoUrl = "/api/users/photo/" + fileName;
+
+            // Update user's photo URL
+            user.setPhotoUrl(photoUrl);
+            userRegisterDetailsRepository.save(user);
+
+            return photoUrl;
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store file: " + e.getMessage());
+        }
+    }
+
+    public byte[] getUserPhoto(String fileName) {
+        try {
+            return fileStorageService.loadFile(fileName);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load file: " + e.getMessage());
+        }
+    }
+
+    public byte[] getUserPhotoByUserId(String userId) {
+        UserRegisterDetails user = userRegisterDetailsRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with userId: " + userId));
+
+        if (user.getPhotoUrl() == null) {
+            throw new RuntimeException("No photo found for user: " + userId);
+        }
+
+        // Extract filename from URL
+        String fileName = user.getPhotoUrl().substring(user.getPhotoUrl().lastIndexOf("/") + 1);
+        return getUserPhoto(fileName);
     }
 }
