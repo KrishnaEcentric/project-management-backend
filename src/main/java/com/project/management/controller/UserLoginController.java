@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@Tag(name = "Authentication API", description = "APIs for user authentication and password management")
+@Tag(name = "Login API", description = "APIs for user authentication and password management")
 public class UserLoginController {
 
     @Autowired

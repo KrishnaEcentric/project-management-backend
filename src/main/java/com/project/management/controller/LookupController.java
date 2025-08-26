@@ -1,13 +1,7 @@
 package com.project.management.controller;
 
-import com.project.management.dto.DzongkhagDTO;
-import com.project.management.dto.GewogDTO;
-import com.project.management.dto.RoleDTO;
-import com.project.management.dto.VillageDTO;
-import com.project.management.service.DzongkhagLookupService;
-import com.project.management.service.GewogLookupService;
-import com.project.management.service.RoleLookupService;
-import com.project.management.service.VillageLookupService;
+import com.project.management.dto.*;
+import com.project.management.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +25,9 @@ public class LookupController {
 
     @Autowired
     private RoleLookupService roleLookupService;
+
+    @Autowired
+    private QualificationLookupService qualificationLookupService;
 
     // 1. Get all dzongkhags
     @Operation(summary = "Get all dzongkhags", description = "Returns a list of all dzongkhags")
@@ -131,6 +128,23 @@ public class LookupController {
         RoleDTO role = roleLookupService.getRoleByRoleId(roleId);
         if (role != null) {
             return ResponseEntity.ok(role);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @Operation(summary = "Get all qualifications", description = "Retrieve a list of all qualifications")
+    @GetMapping("/getAllQualificationsDetails")
+    public ResponseEntity<List<QualificationLookupDTO>> getAllQualifications() {
+        List<QualificationLookupDTO> qualifications = qualificationLookupService.getAllQualifications();
+        return ResponseEntity.ok(qualifications);
+    }
+    @Operation(summary = "Get qualification by qualification ID", description = "Retrieve qualification details by qualification ID")
+    @GetMapping("/qualification-id/{qualificationId}")
+    public ResponseEntity<QualificationLookupDTO> getQualificationByQualificationId(@PathVariable Integer qualificationId) {
+        QualificationLookupDTO qualification = qualificationLookupService.getQualificationByQualificationId(qualificationId);
+        if (qualification != null) {
+            return ResponseEntity.ok(qualification);
         } else {
             return ResponseEntity.notFound().build();
         }

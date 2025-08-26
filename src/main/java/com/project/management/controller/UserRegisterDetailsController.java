@@ -15,14 +15,14 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "User Management API", description = "APIs for managing user registration details")
+@Tag(name = "User Registration API", description = "APIs for managing user registration details")
 public class UserRegisterDetailsController {
 
     @Autowired
     private UserRegisterDetailsService userRegisterDetailsService;
 
     @Operation(summary = "Create new user", description = "Register a new user with the provided details")
-    @PostMapping
+    @PostMapping("/registerNewUser")
     public ResponseEntity<?> createUser(@RequestBody UserRegisterDetailsDTO userDTO) {
         try {
             UserRegisterDetailsDTO createdUser = userRegisterDetailsService.createUser(userDTO);
@@ -36,7 +36,7 @@ public class UserRegisterDetailsController {
     }
 
     @Operation(summary = "Get all users", description = "Retrieve a list of all registered users")
-    @GetMapping
+    @GetMapping("/getAllUsers")
     public ResponseEntity<List<UserRegisterDetailsDTO>> getAllUsers() {
         List<UserRegisterDetailsDTO> users = userRegisterDetailsService.getAllUsers();
         return ResponseEntity.ok(users);
